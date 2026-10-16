@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>ALP Sound Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: sound-card deck on the left, practice bench on the right; stacks on phones. Card colors follow O-G drill-deck convention (vowels on salmon, consonants on white). */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --ink:#1d2733; --muted:#5b6876; --line:#d5dbe2;
+  --cons:#ffffff; --cons-ink:#1f3f66; --vowel:#fbd9cf; --vowel-ink:#8a2c17;
+  --accent:#1f5fa8; --accent-ink:#ffffff; --good:#1f7a4a; --good-bg:#dcf1e5; --warn:#9a5b00; --warn-bg:#fbecd2; --bad:#a3271b; --bad-bg:#f8dcd8;
+  --wave:#1f5fa8; --wave-dim:#9fb3c9; --zone:#1f7a4a33;
+  --f-letter:"Andika","Comic Sans MS",system-ui,sans-serif;
+  --f-ui:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12171d; --surface:#1b222b; --ink:#e7ecf1; --muted:#9aa7b4; --line:#2e3946;
+  --cons:#222b36; --cons-ink:#b9d3f2; --vowel:#4a2a22; --vowel-ink:#ffc6b5;
+  --accent:#6aa6eb; --accent-ink:#0d1620; --good:#7fd6a4; --good-bg:#173a28; --warn:#f2c06b; --warn-bg:#3d2c10; --bad:#ff9d92; --bad-bg:#45201c;
+  --wave:#6aa6eb; --wave-dim:#3d5068; --zone:#7fd6a433; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12171d; --surface:#1b222b; --ink:#e7ecf1; --muted:#9aa7b4; --line:#2e3946;
+  --cons:#222b36; --cons-ink:#b9d3f2; --vowel:#4a2a22; --vowel-ink:#ffc6b5;
+  --accent:#6aa6eb; --accent-ink:#0d1620; --good:#7fd6a4; --good-bg:#173a28; --warn:#f2c06b; --warn-bg:#3d2c10; --bad:#ff9d92; --bad-bg:#45201c;
+  --wave:#6aa6eb; --wave-dim:#3d5068; --zone:#7fd6a433; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:20px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px}
+h1{font-family:var(--f-letter);font-size:1.9rem;margin:0;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:60ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+@media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}.bench{order:-1}.deck{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+.card{font:inherit;cursor:pointer;border:1px solid var(--line);border-radius:6px;padding:8px 4px 6px;display:grid;justify-items:center;gap:0;background:var(--cons);color:var(--cons-ink);min-height:84px}
+.card.v{background:var(--vowel);color:var(--vowel-ink)}
+.card .g{font-family:var(--f-letter);font-size:1.7rem;line-height:1.2}
+.card .k{font-size:.72rem;opacity:.85}
+.card .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:0;margin-top:2px}
+.card.has-model .dot{opacity:.7}
+.card[aria-current="true"]{outline:3px solid var(--accent);outline-offset:1px}
+.card:focus-visible,.btn:focus-visible,.chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.legend{font-size:.8rem;color:var(--muted);margin-top:10px}
+.bench{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:18px}
+.target{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.big{font-family:var(--f-letter);font-size:4rem;line-height:1;min-width:1.4em;text-align:center;padding:10px 14px;border-radius:8px;background:var(--cons);color:var(--cons-ink);border:1px solid var(--line)}
+.big.v{background:var(--vowel);color:var(--vowel-ink)}
+.tmeta{display:grid;gap:2px;min-width:0}
+.tmeta .ph{font-family:var(--f-letter);font-size:1.6rem}
+.tmeta .kw{color:var(--muted)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.tag{font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--line);border-radius:4px;padding:1px 7px;color:var(--muted)}
+.cues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.cues{grid-template-columns:minmax(0,1fr)}}
+.cue h3{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 2px}
+.cue p{margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{font:inherit;font-weight:700;border-radius:8px;padding:10px 16px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.rec{background:var(--bad);color:var(--surface);border-color:var(--bad)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+.result{border-top:1px solid var(--line);padding-top:16px;display:grid;gap:12px}
+.rhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.rhead h2{font-size:1rem;margin:0}
+.pill{font-size:.78rem;font-weight:700;border-radius:999px;padding:2px 10px;background:var(--line);color:var(--ink)}
+canvas{width:100%;height:110px;display:block;background:var(--bg);border-radius:6px}
+.checks{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.check{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border-radius:8px}
+.check.good{background:var(--good-bg);color:var(--good)}
+.check.warn{background:var(--warn-bg);color:var(--warn)}
+.check.bad{background:var(--bad-bg);color:var(--bad)}
+.check .ic{font-weight:700;width:1.2em;text-align:center}
+.check b{display:block}
+.check span{color:var(--ink)}
+.scale{position:relative;height:28px;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.scale .zone{position:absolute;top:0;height:10px;background:var(--zone);border-radius:3px}
+.scale .mark{position:absolute;top:-3px;width:3px;height:16px;background:var(--ink);border-radius:2px}
+.scale .mark.m{background:var(--wave-dim)}
+.scale .tick{position:absolute;top:12px;transform:translateX(-50%)}
+.self{display:grid;gap:6px}
+.self label{display:flex;gap:8px;align-items:flex-start}
+.editor{border:1px dashed var(--line);border-radius:8px;padding:12px;display:grid;gap:8px}
+.editor h3{margin:0;font-size:.9rem}
+.fallback{display:grid;gap:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <h1>ALP Sound Check</h1>
+    <p>Pick a sound card, record yourself saying the sound, and get instant feedback on length and voicing. Use the self-check for what a computer can't hear.</p>
+  </header>
+
+  <div class="main">
+    <section aria-label="Sound cards">
+      <div class="chips" id="chips" role="group" aria-label="Filter sounds"></div>
+      <div class="deck" id="deck"></div>
+      <p class="legend">Salmon cards are vowel sounds, white cards are consonants. A dot means an ALP model recording is available.</p>
+    </section>
+
+    <section class="bench" aria-live="polite">
+      <div class="target">
+        <div class="big" id="big"></div>
+        <div class="tmeta">
+          <div class="ph" id="ph"></div>
+          <div class="kw" id="kw"></div>
+          <div class="tags" id="tags"></div>
+        </div>
+      </div>
+
+      <div class="cues">
+        <div class="cue"><h3>Mouth</h3><p id="cue"></p></div>
+        <div class="cue"><h3>Watch for</h3><p id="watch"></p></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btnModel" type="button">Hear model</button>
+        <button class="btn primary" id="btnRec" type="button">Record</button>
+        <button class="btn" id="btnMine" type="button" disabled>Play mine</button>
+      </div>
+      <p class="note" id="modelNote"></p>
+
+      <div class="fallback" id="fallback" hidden>
+        <p class="note" id="fallbackMsg">This view can't use the microphone. Record the sound with your phone or computer's voice recorder, then add the file here.</p>
+        <label class="btn" for="fileIn" style="justify-self:start">Add a recording</label>
+        <input class="sr" type="file" id="fileIn" accept="audio/*" capture="user">
+      </div>
+
+      <div class="result" id="result">
+        <div class="rhead">
+          <h2 id="rTitle">Your sound</h2>
+          <span class="pill" id="rPill"></span>
+        </div>
+        <canvas id="wave" width="1200" height="220" aria-label="Waveform of the recording"></canvas>
+        <div>
+          <div class="scale" id="scale"></div>
+        </div>
+        <ul class="checks" id="checks"></ul>
+        <div class="self">
+          <h3 class="cue" style="margin:0"><span style="font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Self-check after listening back</span></h3>
+          <div id="selfList"></div>
+        </div>
+      </div>
+
+      <div class="editor" id="editor" hidden>
+        <h3>ALP model recording for this sound</h3>
+        <p class="note">Only editors see this. Upload a clean recording of the isolated sound. Tutors will hear it with "Hear model" and see its length next to theirs.</p>
+        <div class="actions">
+          <label class="btn" for="modelIn">Upload model</label>
+          <input class="sr" type="file" id="modelIn" accept="audio/*">
+          <button class="btn" id="btnClearModel" type="button" hidden>Remove model</button>
+        </div>
+        <p class="note" id="editorMsg"></p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+// type: quick = clipped (stop/affricate/glide), cont = continuous consonant, vowel
+// voiced: true/false for voicing check on continuous consonants; null = no check
+const S=[
+ ["b","b","/b/","bat","Consonants","quick",true,"Lips together, then pop them open with voice.","Adding “uh” (buh). Cut it off right after the pop."],
+ ["c","c","/k/","cat","Consonants","quick",false,"Back of the tongue presses the roof of the mouth, then releases a puff of air.","“kuh.” It should be a whisper with no voice."],
+ ["d","d","/d/","dog","Consonants","quick",true,"Tongue tip behind the top teeth, then drop it with voice.","Adding “uh” (duh)."],
+ ["f","f","/f/","fish","Consonants","cont",false,"Top teeth rest on the bottom lip. Push air through.","Humming or adding “uh.” Air only."],
+ ["g","g","/g/","goat","Consonants","quick",true,"Back of the tongue up, release with voice.","Adding “uh” (guh)."],
+ ["h","h","/h/","hand","Consonants","quick",false,"Mouth open. One short breath, like fogging a mirror.","Saying “huh.” Just the breath."],
+ ["j","j","/j/","jump","Consonants","quick",true,"Lips pushed forward, tongue up, release with voice.","Adding “uh” (juh)."],
+ ["k","k","/k/","kite","Consonants","quick",false,"Back of the tongue presses the roof of the mouth, then releases a puff of air.","“kuh.” Whisper it."],
+ ["l","l","/l/","lion","Consonants","cont",true,"Tongue tip behind the top teeth. Let the voice flow around it.","Saying the letter name “el” or “luh.” Hold /lll/."],
+ ["m","m","/m/","mop","Consonants","cont",true,"Lips closed. Hum through your nose.","Opening into “muh.” Keep lips shut the whole time."],
+ ["n","n","/n/","nest","Consonants","cont",true,"Tongue tip up behind the teeth. Hum through your nose.","Opening into “nuh.”"],
+ ["p","p","/p/","popcorn","Consonants","quick",false,"Lips together, pop a puff of air.","“puh.” It should be a whisper."],
+ ["qu","qu","/kw/","queen","Consonants","quick",null,"Start with /k/, then round the lips into /w/.","“kwuh.” Two quick sounds, no vowel."],
+ ["r","r","/r/","rocket","Consonants","cont",true,"Lips slightly rounded, tongue pulled back. A low growl.","Saying “er” or “ruh.” Hold /rrr/."],
+ ["s","s","/s/","sun","Consonants","cont",false,"Teeth close together, tongue behind them. Hiss.","Buzzing (that's /z/). Air only."],
+ ["t","t","/t/","teacher","Consonants","quick",false,"Tongue tip taps behind the top teeth, puff of air.","“tuh.” Whisper it."],
+ ["v","v","/v/","van","Consonants","cont",true,"Top teeth on the bottom lip. Buzz.","No buzz (that's /f/). Feel it on your lip."],
+ ["w","w","/w/","wind","Consonants","quick",true,"Round the lips, then open them quickly.","Adding “uh” (wuh)."],
+ ["x","x","/ks/","fox","Consonants","quick",false,"Say /k/ then /s/, joined.","Saying the letter name “ex.”"],
+ ["y","y","/y/","yogurt","Consonants","quick",true,"Middle of the tongue up, lips in a small smile, glide out.","Adding “uh” (yuh)."],
+ ["z","z","/z/","zebra","Consonants","cont",true,"Same mouth as /s/, add voice. Buzz like a bee.","No buzz (that's /s/)."],
+ ["sh","sh","/sh/","ship","Digraphs","cont",false,"Lips pushed forward, push air. The “quiet” sound.","Adding “uh” (shuh)."],
+ ["ch","ch","/ch/","chin","Digraphs","quick",false,"Lips forward, tongue up, a quick sneeze-like release.","“chuh.” Keep it short and whispered."],
+ ["th1","th","/th/","thumb","Digraphs","cont",false,"Tongue tip between the teeth. Blow air.","Voicing it (that's the /th/ in “them”)."],
+ ["th2","th","/th/ voiced","them","Digraphs","cont",true,"Tongue tip between the teeth. Add voice.","No buzz (that's the /th/ in “thumb”)."],
+ ["wh","wh","/w/","whistle","Digraphs","quick",true,"Round the lips, then open quickly.","Adding “uh” (wuh)."],
+ ["ck","ck","/k/","sock","Digraphs","quick",false,"Back of the tongue up, release a puff of air.","“kuh.” Whisper it."],
+ ["ng","ng","/ng/","ring","Digraphs","cont",true,"Back of the tongue up. Hum through your nose.","Adding a /g/ at the end."],
+ ["nk","nk","/ngk/","sink","Digraphs","quick",null,"Hum /ng/, then a quick /k/.","Adding “uh” after the /k/."],
+ ["a","a","/ă/","apple","Short vowels","vowel",null,"Jaw drops, mouth open wide, tongue low.","Drifting to /ĕ/, or gliding (“a-yuh”)."],
+ ["e","e","/ĕ/","edge","Short vowels","vowel",null,"Mouth slightly open, small smile. Jaw lower than /ĭ/.","Sounding like /ĭ/. Keep the jaw down."],
+ ["i","i","/ĭ/","itch","Short vowels","vowel",null,"Small smile, jaw a little higher than /ĕ/.","Sounding like /ĕ/."],
+ ["o","o","/ŏ/","octopus","Short vowels","vowel",null,"Mouth open tall and round, like at the doctor.","Sounding like /ŭ/ or /aw/."],
+ ["u","u","/ŭ/","up","Short vowels","vowel",null,"Relaxed, slightly open mouth. Sound comes from the belly.","Sounding like /ŏ/. Keep it relaxed."]
+].map(r=>({id:r[0],g:r[1],p:r[2],kw:r[3],cat:r[4],type:r[5],voiced:r[6],cue:r[7],watch:r[8]}));
+const CATS=["All","Consonants","Digraphs","Short vowels"];
+const TYPES={quick:{label:"Clipped",zone:[0.04,0.3],max:1.2},cont:{label:"Continuous",zone:[0.6,2.5],max:3},vowel:{label:"Vowel",zone:[0.3,2.5],max:3}};
+const SELF={
+ quick:["No “uh” after the sound","Voice is on/off as marked","Sound stopped cleanly"],
+ cont:["Held steady with no “uh” at the end","Voice is on/off as marked","Mouth matched the cue"],
+ vowel:["Matches the key word's sound","No glide into a second sound","Mouth matched the cue"]};
+
+const $=id=>document.getElementById(id);
+let cat="All", cur=S[0], models={}, myBlobUrl=null, actx=null, mic=null, recorder=null, recTimer=null, assets=null, db=null;
+const ctx=()=>actx||(actx=new (window.AudioContext||window.webkitAudioContext)());
+
+function renderChips(){$("chips").innerHTML="";CATS.forEach(c=>{const b=document.createElement("button");b.className="chip";b.type="button";b.textContent=c;b.setAttribute("aria-pressed",c===cat);b.onclick=()=>{cat=c;renderChips();renderDeck()};$("chips").appendChild(b)})}
+function renderDeck(){const d=$("deck");d.innerHTML="";S.filter(s=>cat==="All"||s.cat===cat).forEach(s=>{const b=document.createElement("button");b.type="button";b.className="card"+(s.type==="vowel"?" v":"")+(models[s.id]?" has-model":"");b.setAttribute("aria-current",s===cur);b.setAttribute("aria-label",`${s.g}, ${s.p}, ${s.kw}`);b.innerHTML=`<span class="g"></span><span class="k"></span><span class="dot"></span>`;b.querySelector(".g").textContent=s.g;b.querySelector(".k").textContent=s.kw;b.onclick=()=>select(s);d.appendChild(b)})}
+function select(s){cur=s;renderDeck();
+ $("big").textContent=s.g;$("big").className="big"+(s.type==="vowel"?" v":"");
+ $("ph").textContent=s.p;$("kw").textContent="Key word: "+s.kw;
+ const tags=[TYPES[s.type].label];if(s.voiced===true)tags.push("Voiced");if(s.voiced===false)tags.push("Unvoiced");
+ $("tags").innerHTML="";tags.forEach(t=>{const e=document.createElement("span");e.className="tag";e.textContent=t;$("tags").appendChild(e)});
+ $("cue").textContent=s.cue;$("watch").textContent=s.watch;
+ $("btnModel").textContent=models[s.id]?"Hear ALP model":"Hear key word";
+ $("modelNote").textContent=models[s.id]?"":"No ALP model recording yet for this sound, so “Hear key word” says “"+s.kw+"” with a computer voice. Listen for the first sound.";
+ $("btnClearModel").hidden=!models[s.id];$("editorMsg").textContent="";
+ if(myBlobUrl){URL.revokeObjectURL(myBlobUrl);myBlobUrl=null}$("btnMine").disabled=true;
+ renderSelf();showExample();}
+function renderSelf(){const l=$("selfList");l.innerHTML="";SELF[cur.type].forEach((t,i)=>{const id="sc"+i;const w=document.createElement("label");w.innerHTML=`<input type="checkbox" id="${id}"> <span></span>`;w.querySelector("span").textContent=t;l.appendChild(w)})}
+
+// ---------- analysis ----------
+function toMono(buf){const n=buf.length,out=new Float32Array(n);for(let c=0;c<buf.numberOfChannels;c++){const d=buf.getChannelData(c);for(let i=0;i<n;i++)out[i]+=d[i]/buf.numberOfChannels}return out}
+function analyze(x,sr){
+ const hop=Math.round(sr*0.01),win=Math.round(sr*0.03),N=Math.max(1,Math.floor((x.length-win)/hop));
+ const rms=new Float32Array(N);for(let f=0;f<N;f++){let s=0;const o=f*hop;for(let i=0;i<win;i++){const v=x[o+i]||0;s+=v*v}rms[f]=Math.sqrt(s/win)}
+ const sorted=Array.from(rms).sort((a,b)=>a-b),floor=sorted[Math.floor(N*0.15)]||0,peak=sorted[N-1]||0;
+ const thr=Math.max(floor*3,peak*0.08,0.004);
+ let a=-1,b=-1;for(let f=0;f<N;f++)if(rms[f]>thr){if(a<0)a=f;b=f}
+ const res={rms,thr,peak,hop,sr,start:a,end:b,dur:a<0?0:(b-a+1)*0.01,voicedFrac:null,quiet:peak<0.01};
+ if(a>=0){let v=0,t=0;const lo=Math.floor(sr/400),hi=Math.floor(sr/75);
+  for(let f=a;f<=b;f+=2){if(rms[f]<thr)continue;t++;const o=f*hop;let e0=0;for(let i=0;i<win;i++){const q=x[o+i]||0;e0+=q*q}
+   let best=0;for(let L=lo;L<=hi;L+=2){let s=0;for(let i=0;i<win-L;i++)s+=(x[o+i]||0)*(x[o+i+L]||0);if(s>best)best=s}
+   if(e0>0&&best/e0>0.45)v++}
+  res.voicedFrac=t?v/t:null}
+ return res}
+function verdict(s,r){
+ const out=[];const z=TYPES[s.type].zone;
+ if(r.quiet||r.start<0){out.push(["bad","!","Too quiet to measure","Move closer to the mic and try again."]);return out}
+ const d=r.dur.toFixed(2)+"s";
+ if(s.type==="quick"){
+  if(r.dur<=0.3)out.push(["good","✓","Clipped ("+d+")","Short and clean, the way a stop sound should be."]);
+  else if(r.dur<=0.42)out.push(["warn","~","A bit long ("+d+")","You may be letting a little “uh” in. Stop the sound right after the release."]);
+  else out.push(["bad","!","Too long for a clipped sound ("+d+")","This length usually means a vowel was added ("+s.p.replace(/\//g,"")+"-uh). Cut it off right after the release."]);
+ }else if(s.type==="cont"){
+  if(r.dur>=0.6)out.push(["good","✓","Held steady ("+d+")","Continuous sounds can be stretched. This is long enough for a student to hear it."]);
+  else if(r.dur>=0.35)out.push(["warn","~","Hold it longer ("+d+")","Stretch it to about one second: "+s.p+s.p.slice(1,-1).repeat(2)+"…"]);
+  else out.push(["bad","!","Too short ("+d+")","This is a continuous sound. Hold it for about one second."]);
+ }else{
+  if(r.dur>=0.3)out.push(["good","✓","Full vowel ("+d+")","Long enough to hear clearly. Listen back to check it matches “"+s.kw+".”"]);
+  else out.push(["warn","~","Very short ("+d+")","Say the vowel fully so the student can hear it."]);
+ }
+ if(s.type==="cont"&&s.voiced!==null&&r.voicedFrac!==null){
+  const v=r.voicedFrac;
+  if(s.voiced){ if(v>=0.45)out.push(["good","✓","Voice on","Your vocal cords were buzzing, as they should for "+s.p+"."]);
+    else out.push(["warn","~","Little voicing detected (estimate)",s.p+" needs voice. Put a hand on your throat and feel the buzz."]);}
+  else{ if(v<=0.35)out.push(["good","✓","Air only","No voicing detected, as it should be for "+s.p+"."]);
+    else out.push(["warn","~","Voicing detected (estimate)",s.p+" is air only. Hand on your throat: there should be no buzz."]);}
+ }
+ return out}
+function drawWave(x,r,model){
+ const c=$("wave"),g=c.getContext("2d"),W=c.width,H=c.height,cs=getComputedStyle(document.documentElement);
+ g.clearRect(0,0,W,H);
+ const seconds=TYPES[cur.type].max,len=Math.min(x.length,Math.round(seconds*r.sr)),off=r.start>=0?Math.max(0,r.start*r.hop-Math.round(0.08*r.sr)):0;
+ const span=Math.round(seconds*r.sr),per=span/W;
+ const a=r.start*r.hop,b=(r.end+1)*r.hop+Math.round(0.03*r.sr);
+ for(let px=0;px<W;px++){let mn=0,mx=0;const s0=off+Math.floor(px*per),s1=Math.min(x.length,off+Math.floor((px+1)*per));for(let i=s0;i<s1;i++){const v=x[i];if(v<mn)mn=v;if(v>mx)mx=v}
+  const scale=0.45*H/Math.max(r.peak*3,0.02);const active=r.start>=0&&s0>=a&&s0<=b;g.fillStyle=cs.getPropertyValue(active?"--wave":"--wave-dim").trim();
+  g.fillRect(px,H/2-Math.min(H/2,mx*scale*1),1,Math.max(1,Math.min(H,(mx-mn)*scale)))}
+ // scale bar
+ const sc=$("scale");sc.innerHTML="";const z=TYPES[cur.type].zone,max=seconds;
+ const zone=document.createElement("div");zone.className="zone";zone.style.left=(z[0]/max*100)+"%";zone.style.width=((Math.min(z[1],max)-z[0])/max*100)+"%";sc.appendChild(zone);
+ for(let t=0;t<=max+1e-6;t+=(max>2?0.5:0.25)){const k=document.createElement("span");k.className="tick";k.style.left=Math.min(98,t/max*100)+"%";k.textContent=t.toFixed(2)+"s";sc.appendChild(k)}
+ if(model&&model.dur){const m=document.createElement("div");m.className="mark m";m.title="ALP model length";m.style.left=Math.min(99,model.dur/max*100)+"%";sc.appendChild(m)}
+ if(r.dur){const m=document.createElement("div");m.className="mark";m.title="Your length";m.style.left=Math.min(99,r.dur/max*100)+"%";sc.appendChild(m)}
+}
+function showResult(x,sr,title,pill){
+ const r=analyze(x,sr);$("rTitle").textContent=title;$("rPill").textContent=pill;
+ const m=models[cur.id]&&models[cur.id].an;drawWave(x,r,m);
+ const ul=$("checks");ul.innerHTML="";
+ const items=verdict(cur,r);
+ if(m&&m.dur&&r.dur)items.push(["good","↔","ALP model: "+m.dur.toFixed(2)+"s","The grey mark on the scale is the model's length. The dark mark is yours."]);
+ items.forEach(([cls,ic,h,t])=>{const li=document.createElement("li");li.className="check "+cls;li.innerHTML=`<span class="ic"></span><div><b></b><span></span></div>`;li.querySelector(".ic").textContent=ic;li.querySelector("b").textContent=h;li.querySelector("span:last-child").textContent=t;ul.appendChild(li)});
+}
+// Example shown before the first recording: a synthetic clipped sound with an added vowel, so the screen shows what feedback looks like.
+function showExample(){
+ const sr=16000,x=new Float32Array(Math.round(sr*TYPES[cur.type].max));let seed=7;const rnd=()=>((seed=(seed*16807)%2147483647)/2147483647)*2-1;
+ const st=Math.round(0.15*sr);
+ if(cur.type==="quick"){for(let i=0;i<0.06*sr;i++)x[st+i]=rnd()*0.5*Math.exp(-i/(0.015*sr));for(let i=0;i<0.38*sr;i++){const t=i/sr;x[st+0.05*sr+i]=0.35*Math.sin(2*Math.PI*140*t)*Math.sin(Math.PI*i/(0.38*sr))*(1+0.3*Math.sin(2*Math.PI*420*t))}}
+ else{const L=Math.round(0.42*sr);for(let i=0;i<L;i++){const t=i/sr,env=Math.min(1,i/(0.03*sr),(L-i)/(0.05*sr));x[st+i]=env*(cur.voiced===false?rnd()*0.25:0.35*Math.sin(2*Math.PI*130*t)*(1+0.4*Math.sin(2*Math.PI*390*t)))}}
+ showResult(x,sr,"Example result","Example · not you");}
+
+// ---------- audio in ----------
+async function decodeBlob(blob){const ab=await blob.arrayBuffer();return await ctx().decodeAudioData(ab)}
+async function handleBlob(blob){
+ if(myBlobUrl)URL.revokeObjectURL(myBlobUrl);myBlobUrl=URL.createObjectURL(blob);$("btnMine").disabled=false;
+ try{const buf=await decodeBlob(blob);showResult(toMono(buf),buf.sampleRate,"Your "+cur.p,"Just now")}
+ catch(e){$("checks").innerHTML="";const li=document.createElement("li");li.className="check bad";li.innerHTML='<span class="ic">!</span><div><b>Couldn’t read that recording</b><span>Try an .m4a, .mp3, .wav or .webm file.</span></div>';$("checks").appendChild(li)}}
+async function startRec(){
+ try{
+  if(!mic)mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  ctx().resume&&ctx().resume();
+  const chunks=[];recorder=new MediaRecorder(mic);recorder.ondataavailable=e=>e.data.size&&chunks.push(e.data);
+  recorder.onstop=()=>{clearTimeout(recTimer);$("btnRec").textContent="Record";$("btnRec").className="btn primary";handleBlob(new Blob(chunks,{type:recorder.mimeType||"audio/webm"}))};
+  recorder.start();$("btnRec").textContent="Stop";$("btnRec").className="btn rec";
+  recTimer=setTimeout(()=>recorder&&recorder.state==="recording"&&recorder.stop(),4000);
+ }catch(e){$("fallback").hidden=false;$("btnRec").disabled=true;$("btnRec").title="Microphone not available in this view"}}
+$("btnRec").onclick=()=>{if(recorder&&recorder.state==="recording")recorder.stop();else startRec()};
+$("fileIn").onchange=e=>{const f=e.target.files[0];if(f)handleBlob(f);e.target.value=""};
+$("btnMine").onclick=()=>{if(myBlobUrl)new Audio(myBlobUrl).play()};
+$("btnModel").onclick=()=>{
+ const m=models[cur.id];
+ if(m){new Audio(m.url).play().catch(()=>{});return}
+ try{const u=new SpeechSynthesisUtterance(cur.kw);u.rate=0.8;u.lang="en-US";speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){$("modelNote").textContent="This browser can't play a computer voice."}};
+if(!(navigator.mediaDevices&&window.MediaRecorder)){$("fallback").hidden=false;$("btnRec").disabled=true}
+
+// ---------- shared ALP model recordings (editors upload, everyone hears) ----------
+function docsOf(snap){if(!snap)return[];if(Array.isArray(snap))return snap;if(Array.isArray(snap.docs))return snap.docs;return[]}
+function dataOf(d){if(!d)return null;if(typeof d.data==="function")return d.data();return d.data||d}
+async function loadModelAudio(id,assetId){
+ models[id]={assetId,url:"/_blob/"+assetId};
+ try{const r=await fetch(models[id].url);const buf=await ctx().decodeAudioData(await r.arrayBuffer());models[id].an=analyze(toMono(buf),buf.sampleRate)}catch(e){}
+}
+async function applyModels(list){
+ const next={};for(const d of docsOf(list)){const v=dataOf(d);const id=d.id||(v&&v.sound);if(id&&v&&v.assetId)next[id]=v.assetId}
+ for(const id of Object.keys(models))if(!next[id])delete models[id];
+ await Promise.all(Object.entries(next).map(([id,a])=>models[id]&&models[id].assetId===a?null:loadModelAudio(id,a)));
+ renderDeck();const keep=$("btnMine").disabled;select(cur);
+}
+async function loadRepoModels(){
+ await Promise.all(S.map(async s=>{for(const name of [s.id,s.id.toUpperCase()])for(const ext of ["m4a","mp3","wav","M4A","MP3","WAV"]){const url="models/"+name+"."+ext;
+  try{const r=await fetch(url);if(!r.ok)continue;const ab=await r.arrayBuffer();models[s.id]={url};
+   try{const buf=await ctx().decodeAudioData(ab);models[s.id].an=analyze(toMono(buf),buf.sampleRate)}catch(e){}
+   return}catch(e){}}}));
+ renderDeck();select(cur);
+}
+(async()=>{
+ if(!window.claude||!window.claude.use){loadRepoModels();return}
+ try{db=await window.claude.use("db")}catch(e){}
+ if(db){try{const col=db.collection("models");if(col.onSnapshot)col.onSnapshot(s=>applyModels(s));else applyModels(await col.get())}catch(e){}}
+ try{assets=await window.claude.use("assets")}catch(e){}
+ if(assets&&db){$("editor").hidden=false}
+})();
+$("modelIn").onchange=async e=>{
+ const f=e.target.files[0];e.target.value="";if(!f||!assets||!db)return;
+ $("editorMsg").textContent="Uploading…";
+ try{const up=await assets.upload(f);await db.doc("models/"+cur.id).set({assetId:up.id,sound:cur.id});await loadModelAudio(cur.id,up.id);renderDeck();select(cur);$("editorMsg").textContent="Saved. Tutors will hear this model for "+cur.p+"."}
+ catch(err){$("editorMsg").textContent="Upload didn’t go through ("+(err&&err.code||"error")+"). Check you have edit access and try again."}};
+$("btnClearModel").onclick=async()=>{
+ if(!db)return;try{await db.doc("models/"+cur.id).delete();delete models[cur.id];renderDeck();select(cur);$("editorMsg").textContent="Model removed."}catch(err){$("editorMsg").textContent="Couldn’t remove it ("+(err&&err.code||"error")+")."}};
+
+renderChips();select(S[0]);
+</script>
+
+</body>
+</html>
